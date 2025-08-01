@@ -8,13 +8,11 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        const firebaseConfig = { /* same config as before */ };
+        const firebaseConfig = { /* same config */ };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
         const ADMIN_PASSWORD = "admin@0385";
-
-        // ---- Categories ----
         const videos = [
             { id: "1jbytLPLR7vujtFcICnZjtzgoY-SjbwKl", title: "HND_Kesari Chapter 2" },
             { id: "1BLms4P3ZU3cDWgHo95flbrk8R2F8QeHf", title: "HND_Stolen" }
@@ -61,22 +59,52 @@
                     <div class="media-title">${item.title}</div>`;
                 container.appendChild(block);
             });
+            document.getElementById('categorySection').style.display = 'block';
         }
 
-        // --- (login, admin, password logic remains same) ---
+        async function listenToPassword(password){ /* unchanged */ }
+        function forceLogout(){ /* unchanged */ }
 
-        window.checkPassword = async function(){ /* unchanged */ }
-        window.logout = function(){ /* unchanged */ }
-        window.adminLogin = async function(){ /* unchanged */ }
-        // ... (rest of your existing admin functions unchanged)
+        window.checkPassword = async function(){
+            const input = document.getElementById('password').value.trim();
+            if (!input) return alert("Enter password!");
+            const deviceId = getDeviceId();
 
-        window.addEventListener("DOMContentLoaded", ()=>{
-            switchCategory('video');
-        });
+            try {
+                const docRef = doc(db, "passwords", input);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (data.used && data.deviceId !== deviceId) {
+                        alert("Password already used on another device!");
+                        return;
+                    }
+                    await updateDoc(docRef, { used: true, deviceId: deviceId });
+                    localStorage.setItem("sessionPassword", input);
+                    listenToPassword(input);
+                    alert("Login successful!");
+                    switchCategory('video');
+                } else {
+                    alert("Invalid password!");
+                }
+            } catch (error) {
+                console.error("Error checking password:", error);
+                alert("Something went wrong! Check console.");
+            }
+        };
+
+        window.logout = function(){
+            document.getElementById('mediaList').innerHTML = "";
+            document.getElementById('categorySection').style.display = 'none';
+            if (unsubscribePasswordListener) unsubscribePasswordListener();
+        };
     </script>
     <style>
         body {font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;margin:0;background:linear-gradient(120deg,#2c3e50,#3498db);color:#fff;}
         header {text-align:center;padding:20px;background:rgba(0,0,0,0.5);}
+        #loginControls {margin-top:15px;}
+        input,button {padding:10px;font-size:16px;border:none;border-radius:4px;}
         .tabs {display:flex;justify-content:center;gap:10px;margin:10px 0;}
         .tab-btn {padding:10px 20px;background:#f1c40f;color:#000;cursor:pointer;border:none;border-radius:4px;}
         .tab-btn.active {background:#d4ac0d;}
@@ -90,14 +118,19 @@
 <body>
 <header>
     <h1>IDONOTHINGALLDAYS</h1>
+    <div id="loginControls">
+        <input type="password" id="password" placeholder="Enter One-Time Password">
+        <button onclick="checkPassword()">Login</button>
+        <button onclick="logout()">Logout</button>
+    </div>
+</header>
+<section id="categorySection" style="display:none;">
     <div class="tabs">
         <button id="video-tab" class="tab-btn active" onclick="switchCategory('video')">Videos</button>
         <button id="mp3-tab" class="tab-btn" onclick="switchCategory('mp3')">MP3</button>
         <button id="software-tab" class="tab-btn" onclick="switchCategory('software')">Software</button>
     </div>
-</header>
-<main>
     <div class="media-grid" id="mediaList"></div>
-</main>
+</section>
 </body>
 </html>
