@@ -5,21 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UHWC Monthly Reporting</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f4f4f4; }
-        .login-container, .form-container { max-width: 900px; margin: auto; padding: 20px; background: white; margin-top: 40px; box-shadow: 0 0 5px rgba(0,0,0,0.3); border-radius: 8px; }
+        body { font-family: Calibri, Arial, sans-serif; background: #f0f2f5; margin: 0; }
         h1, h2 { text-align: center; }
-        label { font-weight: bold; display: block; margin-top: 15px; }
-        input, select, textarea { width: 100%; padding: 8px; margin-top: 5px; }
-        button { background: #007BFF; color: white; padding: 10px 15px; border: none; cursor: pointer; border-radius: 4px; margin-top: 20px; }
-        button:hover { background: #0056b3; }
+        .login-container, .form-container {
+            max-width: 1100px; margin: 40px auto; padding: 20px; background: white; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3); border-radius: 6px;
+        }
+        label { font-weight: bold; margin-top: 15px; display: block; }
+        input, select { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 3px; }
+        button { background: #1e6f43; color: white; padding: 10px 20px; margin-top: 20px; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #155b33; }
         .hidden { display: none; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-        th { background: #f0f0f0; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+        th, td { border: 1px solid #d4d4d4; padding: 6px; text-align: center; }
+        th { background: #1e6f43; color: white; font-weight: bold; }
+        tr:nth-child(even) { background: #f9f9f9; }
+
+        .header-title { text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 20px; }
+        .section-label { background: #d9ead3; padding: 5px; font-weight: bold; margin-top: 20px; }
     </style>
 </head>
 <body>
 
+<!-- Login Page -->
 <div class="login-container" id="loginPage">
     <h1>Admin Login</h1>
     <label for="username">Username</label>
@@ -29,11 +38,14 @@
     <button onclick="login()">Login</button>
 </div>
 
+<!-- Form Page -->
 <div class="form-container hidden" id="formPage">
-    <h2>MANIPUR: UAAM (UHWC) Monthly Reporting Format</h2>
+    <div class="header-title">MANIPUR: UAAM (UHWC) Monthly Reporting Format</div>
     
+    <div class="section-label">Facility Details</div>
     <label>Select District</label>
     <select id="district">
+        <option value="">-- Select District --</option>
         <option>Imphal West</option>
         <option>Imphal East</option>
         <option>Thoubal</option>
@@ -41,10 +53,20 @@
     </select>
 
     <label>Name of the Block</label>
-    <input type="text" id="block">
+    <select id="block">
+        <option value="">-- Select Block --</option>
+        <option>Block A</option>
+        <option>Block B</option>
+        <option>Block C</option>
+    </select>
 
     <label>Name of the Facility</label>
-    <input type="text" id="facility">
+    <select id="facility">
+        <option value="">-- Select Facility --</option>
+        <option>U-AAM Thangal Bazar</option>
+        <option>U-AAM XYZ Center</option>
+        <option>U-AAM ABC Facility</option>
+    </select>
 
     <label>Report Month and Year</label>
     <input type="month" id="reportMonth">
@@ -55,7 +77,7 @@
     <label>Catchment Population</label>
     <input type="number" id="population">
 
-    <label>Performance Table</label>
+    <div class="section-label">Performance Indicators</div>
     <table id="performanceTable">
         <thead>
             <tr>
@@ -70,16 +92,24 @@
         </thead>
         <tbody>
             <tr>
-                <td>1</td><td><input type="text" value="Example Indicator 1"></td>
-                <td><input type="text"></td><td><input type="number"></td>
-                <td><input type="number"></td><td><input type="number"></td><td><input type="number"></td>
+                <td>1</td>
+                <td><input type="text" value="Example Indicator 1"></td>
+                <td><input type="text"></td>
+                <td><input type="number"></td>
+                <td><input type="number"></td>
+                <td><input type="number"></td>
+                <td><input type="number"></td>
             </tr>
             <tr>
-                <td>2</td><td><input type="text" value="Example Indicator 2"></td>
-                <td><input type="text"></td><td><input type="number"></td>
-                <td><input type="number"></td><td><input type="number"></td><td><input type="number"></td>
+                <td>2</td>
+                <td><input type="text" value="Example Indicator 2"></td>
+                <td><input type="text"></td>
+                <td><input type="number"></td>
+                <td><input type="number"></td>
+                <td><input type="number"></td>
+                <td><input type="number"></td>
             </tr>
-            <!-- Add more rows as needed -->
+            <!-- Add more rows as required -->
         </tbody>
     </table>
 
