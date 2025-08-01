@@ -3,151 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IDONOTHINGALLDAYS</title>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        const firebaseConfig = { /* same config */ };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        const ADMIN_PASSWORD = "admin@0385";
-        const videos = [
-            { id: "1jbytLPLR7vujtFcICnZjtzgoY-SjbwKl", title: "HND_Kesari Chapter 2" },
-            { id: "1BLms4P3ZU3cDWgHo95flbrk8R2F8QeHf", title: "HND_Stolen" }
-        ];
-        const mp3 = [
-            { id: "mp3ID1", title: "Song 1" },
-            { id: "mp3ID2", title: "Song 2" }
-        ];
-        const software = [
-            { id: "softID1", title: "TeraCopy" },
-            { id: "softID2", title: "Another Software" }
-        ];
-
-        let currentCategory = "video";
-        let unsubscribePasswordListener = null;
-
-        function getDeviceId(){
-            let id = localStorage.getItem("deviceId");
-            if(!id){ id = crypto.randomUUID(); localStorage.setItem("deviceId", id); }
-            return id;
-        }
-
-        function switchCategory(cat){
-            currentCategory = cat;
-            loadCategory();
-            document.querySelectorAll('.tab-btn').forEach(btn=>btn.classList.remove('active'));
-            document.getElementById(`${cat}-tab`).classList.add('active');
-        }
-
-        function loadCategory(){
-            const container = document.getElementById('mediaList');
-            container.innerHTML = "";
-            let data = currentCategory === "video" ? videos : currentCategory === "mp3" ? mp3 : software;
-            data.forEach(item => {
-                const block = document.createElement('div');
-                block.className = 'media-block';
-                block.innerHTML = `
-                    <div class="media-container">
-                        ${currentCategory === 'video' ?
-                            `<iframe src="https://drive.google.com/file/d/${item.id}/preview?rm=minimal" allowfullscreen></iframe>` :
-                            `<a href="https://drive.google.com/uc?id=${item.id}&export=download" target="_blank">Download</a>`
-                        }
-                    </div>
-                    <div class="media-title">${item.title}</div>`;
-                container.appendChild(block);
-            });
-            document.getElementById('categorySection').style.display = 'block';
-        }
-
-        async function listenToPassword(password){ /* unchanged */ }
-        function forceLogout(){ /* unchanged */ }
-
-        window.checkPassword = async function(){
-            const input = document.getElementById('password').value.trim();
-            if (!input) return alert("Enter password!");
-            const deviceId = getDeviceId();
-
-            try {
-                const docRef = doc(db, "passwords", input);
-                const docSnap = await getDoc(docRef);
-
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    if (data.used && data.deviceId !== deviceId) {
-                        alert("Password already used on another device!");
-                        return;
-                    }
-                    await updateDoc(docRef, { used: true, deviceId: deviceId });
-                    localStorage.setItem("sessionPassword", input);
-                    listenToPassword(input);
-                    alert("Login successful!");
-                    switchCategory('video');
-                } else {
-                    alert("Invalid password!");
-                }
-            } catch (error) {
-                console.error("Error checking password:", error);
-                alert("Something went wrong! Check console.");
-            }
-        };
-
-        window.logout = function(){
-            document.getElementById('mediaList').innerHTML = "";
-            document.getElementById('categorySection').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'none';
-            if (unsubscribePasswordListener) unsubscribePasswordListener();
-        };
-
-        window.adminLogin = function(){
-            const pass = prompt("Enter Admin Password:");
-            if (pass === ADMIN_PASSWORD){
-                alert("Admin login successful!");
-                document.getElementById('adminPanel').style.display = 'block';
-            } else {
-                alert("Incorrect admin password!");
-            }
-        }
-    </script>
+    <title>UHWC Monthly Reporting</title>
     <style>
-        body {font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;margin:0;background:linear-gradient(120deg,#2c3e50,#3498db);color:#fff;}
-        header {text-align:center;padding:20px;background:rgba(0,0,0,0.5);}
-        #loginControls {margin-top:15px;}
-        input,button {padding:10px;font-size:16px;border:none;border-radius:4px;}
-        .tabs {display:flex;justify-content:center;gap:10px;margin:10px 0;}
-        .tab-btn {padding:10px 20px;background:#f1c40f;color:#000;cursor:pointer;border:none;border-radius:4px;}
-        .tab-btn.active {background:#d4ac0d;}
-        .media-grid {display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px;}
-        .media-block {background:rgba(255,255,255,0.15);padding:10px;border-radius:8px;text-align:center;}
-        .media-container {position:relative;padding-bottom:56.25%;height:0;overflow:hidden;}
-        .media-container iframe {position:absolute;top:0;left:0;width:100%;height:100%;border:0;}
-        .media-title {margin-top:10px;font-weight:bold;}
-        #adminPanel {display:none;padding:20px;background:rgba(0,0,0,0.3);margin:10px;border-radius:8px;}
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f4f4f4; }
+        .login-container, .form-container { max-width: 900px; margin: auto; padding: 20px; background: white; margin-top: 40px; box-shadow: 0 0 5px rgba(0,0,0,0.3); border-radius: 8px; }
+        h1, h2 { text-align: center; }
+        label { font-weight: bold; display: block; margin-top: 15px; }
+        input, select, textarea { width: 100%; padding: 8px; margin-top: 5px; }
+        button { background: #007BFF; color: white; padding: 10px 15px; border: none; cursor: pointer; border-radius: 4px; margin-top: 20px; }
+        button:hover { background: #0056b3; }
+        .hidden { display: none; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+        th { background: #f0f0f0; }
     </style>
 </head>
 <body>
-<header>
-    <h1>IDONOTHINGALLDAYS</h1>
-    <div id="loginControls">
-        <input type="password" id="password" placeholder="Enter One-Time Password">
-        <button onclick="checkPassword()">Login</button>
-        <button onclick="logout()">Logout</button>
-        <button onclick="adminLogin()">Admin Login</button>
-    </div>
-</header>
-<section id="categorySection" style="display:none;">
-    <div class="tabs">
-        <button id="video-tab" class="tab-btn active" onclick="switchCategory('video')">Videos</button>
-        <button id="mp3-tab" class="tab-btn" onclick="switchCategory('mp3')">MP3</button>
-        <button id="software-tab" class="tab-btn" onclick="switchCategory('software')">Software</button>
-    </div>
-    <div class="media-grid" id="mediaList"></div>
-</section>
-<section id="adminPanel">
-    <h2>Admin Panel</h2>
-    <p>Here you can add future admin features like password generation and editing media titles.</p>
-</section>
+
+<div class="login-container" id="loginPage">
+    <h1>Admin Login</h1>
+    <label for="username">Username</label>
+    <input type="text" id="username">
+    <label for="password">Password</label>
+    <input type="password" id="password">
+    <button onclick="login()">Login</button>
+</div>
+
+<div class="form-container hidden" id="formPage">
+    <h2>MANIPUR: UAAM (UHWC) Monthly Reporting Format</h2>
+    
+    <label>Select District</label>
+    <select id="district">
+        <option>Imphal West</option>
+        <option>Imphal East</option>
+        <option>Thoubal</option>
+        <option>Bishnupur</option>
+    </select>
+
+    <label>Name of the Block</label>
+    <input type="text" id="block">
+
+    <label>Name of the Facility</label>
+    <input type="text" id="facility">
+
+    <label>Report Month and Year</label>
+    <input type="month" id="reportMonth">
+
+    <label>NIN</label>
+    <input type="number" id="nin">
+
+    <label>Catchment Population</label>
+    <input type="number" id="population">
+
+    <label>Performance Table</label>
+    <table id="performanceTable">
+        <thead>
+            <tr>
+                <th>Sl</th>
+                <th>Data Element / Indicator</th>
+                <th>Data Source</th>
+                <th>Monthly Target</th>
+                <th>Performance for the Month</th>
+                <th>Incentive Amount</th>
+                <th>Incentive To Be Paid</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td><td><input type="text" value="Example Indicator 1"></td>
+                <td><input type="text"></td><td><input type="number"></td>
+                <td><input type="number"></td><td><input type="number"></td><td><input type="number"></td>
+            </tr>
+            <tr>
+                <td>2</td><td><input type="text" value="Example Indicator 2"></td>
+                <td><input type="text"></td><td><input type="number"></td>
+                <td><input type="number"></td><td><input type="number"></td><td><input type="number"></td>
+            </tr>
+            <!-- Add more rows as needed -->
+        </tbody>
+    </table>
+
+    <button onclick="submitData()">Submit Report</button>
+</div>
+
+<script>
+const SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL"; // Replace this
+
+function login() {
+    const user = document.getElementById('username').value;
+    const pass = document.getElementById('password').value;
+    if (user === "admin" && pass === "12345") {
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('formPage').classList.remove('hidden');
+    } else {
+        alert("Invalid login");
+    }
+}
+
+function submitData() {
+    const district = document.getElementById('district').value;
+    const block = document.getElementById('block').value;
+    const facility = document.getElementById('facility').value;
+    const reportMonth = document.getElementById('reportMonth').value;
+    const nin = document.getElementById('nin').value;
+    const population = document.getElementById('population').value;
+
+    const rows = [];
+    document.querySelectorAll("#performanceTable tbody tr").forEach(tr => {
+        const cells = tr.querySelectorAll("input");
+        rows.push({
+            indicator: cells[0].value,
+            source: cells[1].value,
+            monthlyTarget: cells[2].value,
+            performance: cells[3].value,
+            incentiveAmount: cells[4].value,
+            incentivePaid: cells[5].value
+        });
+    });
+
+    const data = {
+        district, block, facility, reportMonth, nin, population, rows
+    };
+
+    fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" }
+    })
+    .then(res => res.text())
+    .then(response => alert("Report submitted successfully!"))
+    .catch(err => alert("Error: " + err));
+}
+</script>
+
 </body>
 </html>
